@@ -99,7 +99,7 @@ class MailXSend {
                 }
                 toValue += name + "<" + address + ">,"
             }
-            params["to"] = toValue.substringToIndex(advance(toValue.startIndex, toValue.utf16Count-1))
+            params["to"] = toValue.substringToIndex(toValue.startIndex.advancedBy(toValue.characters.count-1))
         }
         
         if self.addressbook.count > 0 {
@@ -107,7 +107,7 @@ class MailXSend {
             for addressbookItem in self.addressbook {
                 addressbookValue += addressbookItem + ","
             }
-            params["addressbook"] = addressbookValue.substringToIndex(advance(addressbookValue.startIndex, addressbookValue.utf16Count-1))
+            params["addressbook"] = addressbookValue.substringToIndex(addressbookValue.startIndex.advancedBy(addressbookValue.characters.count-1))
         }
         
         if self.from != nil {
@@ -132,7 +132,7 @@ class MailXSend {
                 }
                 ccValue += name + "<" + address + ">,"
             }
-            params["cc"] = ccValue.substringToIndex(advance(ccValue.startIndex, ccValue.utf16Count-1))
+            params["cc"] = ccValue.substringToIndex(ccValue.startIndex.advancedBy(ccValue.characters.count-1))
         }
         
         if self.bcc.count > 0 {
@@ -145,7 +145,7 @@ class MailXSend {
                 }
                 bccValue += name + "<" + address + ">,"
             }
-            params["bcc"] = bccValue.substringToIndex(advance(bccValue.startIndex, bccValue.utf16Count-1))
+            params["bcc"] = bccValue.substringToIndex(bccValue.startIndex.advancedBy(bccValue.characters.count-1))
         }
         
         params["project"] = self.project
@@ -156,21 +156,21 @@ class MailXSend {
         
         // vars and links and headers need json
         if self.vars.count > 0 {
-            let jsonData = NSJSONSerialization.dataWithJSONObject(self.vars, options: nil, error: nil)
+            let jsonData = try? NSJSONSerialization.dataWithJSONObject(self.vars, options: [])
             if let data = jsonData {
                 params["vars"] = NSString(data: data, encoding: NSUTF8StringEncoding)
             }
         }
         
         if self.links.count > 0 {
-            let jsonData = NSJSONSerialization.dataWithJSONObject(self.links, options: nil, error: nil)
+            let jsonData = try? NSJSONSerialization.dataWithJSONObject(self.links, options: [])
             if let data = jsonData {
                 params["links"] = NSString(data: data, encoding: NSUTF8StringEncoding)
             }
         }
         
         if self.headers.count > 0 {
-            let jsonData = NSJSONSerialization.dataWithJSONObject(self.headers, options: nil, error: nil)
+            let jsonData = try? NSJSONSerialization.dataWithJSONObject(self.headers, options: [])
             if let data = jsonData {
                 params["headers"] = NSString(data: data, encoding: NSUTF8StringEncoding)
             }

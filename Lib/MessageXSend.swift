@@ -50,7 +50,7 @@ class MessageXSend {
             for toItem in self.to {
                 toValue += toItem + ","
             }
-            params["to"] = toValue.substringToIndex(advance(toValue.startIndex, toValue.utf16Count-1))
+            params["to"] = toValue.substringToIndex(toValue.startIndex.advancedBy(toValue.characters.count-1))
         }
         
         if self.addressbook.count > 0 {
@@ -58,13 +58,13 @@ class MessageXSend {
             for addressbookItem in self.addressbook {
                 addressbookValue += addressbookItem + ","
             }
-            params["addressbook"] = addressbookValue.substringToIndex(advance(addressbookValue.startIndex, addressbookValue.utf16Count-1))
+            params["addressbook"] = addressbookValue.substringToIndex(addressbookValue.startIndex.advancedBy(addressbookValue.characters.count-1))
         }
 
         params["project"] = self.project
         
         if self.vars.count > 0 {
-            let jsonData = NSJSONSerialization.dataWithJSONObject(self.vars, options: nil, error: nil)
+            let jsonData = try? NSJSONSerialization.dataWithJSONObject(self.vars, options: [])
             if let data = jsonData {
                 params["vars"] = NSString(data: data, encoding: NSUTF8StringEncoding)
             }

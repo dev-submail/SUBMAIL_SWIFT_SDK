@@ -39,7 +39,7 @@ public class Mail {
                 requestParams["timestamp"] = timestamp
                 requestParams["sign_type"] = "normal"
                 let signTypeState = ["normal", "md5", "sha1"]
-                if let sign = self.params["sign_type"] as String? {
+                if let sign = self.params["sign_type"] as? String {
                     for state in signTypeState {
                         if state == sign {
                             self.signType = sign
@@ -64,14 +64,14 @@ public class Mail {
         if params != nil {
             requestParams = params!
         }
-        if let appid = self.params["appid"] as String? {
+        if let appid = self.params["appid"] as? String {
             requestParams["appid"] = appid
             getTimestamp {
                 timestamp in
                 requestParams["timestamp"] = timestamp
                 requestParams["sign_type"] = "normal"
                 let signTypeState = ["normal", "md5", "sha1"]
-                if let sign = self.params["sign_type"] as String? {
+                if let sign = self.params["sign_type"] as? String {
                     for state in signTypeState {
                         if state == sign {
                             self.signType = sign
@@ -96,14 +96,14 @@ public class Mail {
         if params != nil {
             requestParams = params!
         }
-        if let appid = self.params["appid"] as String? {
+        if let appid = self.params["appid"] as? String {
             requestParams["appid"] = appid
             getTimestamp {
                 timestamp in
                 requestParams["timestamp"] = timestamp
                 requestParams["sign_type"] = "normal"
                 let signTypeState = ["normal", "md5", "sha1"]
-                if let sign = self.params["sign_type"] as String? {
+                if let sign = self.params["sign_type"] as? String {
                     for state in signTypeState {
                         if state == sign {
                             self.signType = sign
@@ -128,14 +128,14 @@ public class Mail {
         if params != nil {
             requestParams = params!
         }
-        if let appid = self.params["appid"] as String? {
+        if let appid = self.params["appid"] as? String {
             requestParams["appid"] = appid
             getTimestamp {
                 timestamp in
                 requestParams["timestamp"] = timestamp
                 requestParams["sign_type"] = "normal"
                 let signTypeState = ["normal", "md5", "sha1"]
-                if let sign = self.params["sign_type"] as String? {
+                if let sign = self.params["sign_type"] as? String {
                     for state in signTypeState {
                         if state == sign {
                             self.signType = sign
@@ -164,11 +164,11 @@ public class Mail {
             if let attachments = attachmentsValue {
                 if attachments.count == 1 {
                     let url = NSURL.fileURLWithPath(attachments[0], isDirectory: false)
-                    formData.appendPartWithFileURL(url, name: "attachments", error: nil)
+                    try! formData.appendPartWithFileURL(url, name: "attachments")
                 } else {
                     for filePath in attachments {
                         let url = NSURL.fileURLWithPath(filePath, isDirectory: false)
-                        formData.appendPartWithFileURL(url, name: "attachments[]", error: nil)
+                        try! formData.appendPartWithFileURL(url, name: "attachments[]")
                     }
                 }
             }
@@ -194,8 +194,8 @@ public class Mail {
         let api = "https://api.submail.cn/service/timestamp.json"
         get(api, params: nil) {
             JSON in
-            if let json = JSON as [String: AnyObject]? {
-                if let timestamp = json["timestamp"] as NSNumber? {
+            if let json = JSON as? [String: AnyObject] {
+                if let timestamp = json["timestamp"] as? NSNumber {
                     completion(timestamp.stringValue)
                 }
             }
@@ -204,7 +204,7 @@ public class Mail {
     
     private func createSignature(params: [String: AnyObject]) -> String {
         if self.signType == "normal" {
-            if let signature = self.params["appkey"] as String? {
+            if let signature = self.params["appkey"] as? String {
                 return signature
             } else {
                 return ""
@@ -215,7 +215,7 @@ public class Mail {
     }
     
     private func buildSignature(params: [String: AnyObject]) -> String {
-        let sortedArray = sorted(params.keys.array)
+        let sortedArray = params.keys.sort()
         var signStr = ""
         for key in sortedArray {
             if key != "attachments" {
@@ -224,13 +224,13 @@ public class Mail {
                 }
             }
         }
-        signStr = signStr.substringToIndex(advance(signStr.startIndex, signStr.utf16Count-1))
+        signStr = signStr.substringToIndex(signStr.startIndex.advancedBy(signStr.characters.count-1))
         
         signStr = self.appId + self.appKey + signStr + self.appId + self.appKey
         
         if self.signType == "md5" {
 
-            if let md5 = signStr.md5() {
+            if let md5 = (signStr as NSString).md5() {
                 return md5
             } else {
                 return ""

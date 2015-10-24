@@ -32,14 +32,14 @@ public class Message {
         if params != nil {
             requestParams = params!
         }
-        if let appid = self.params["appid"] as String? {
+        if let appid = self.params["appid"] as? String {
             requestParams["appid"] = appid
             getTimestamp {
                 timestamp in
                 requestParams["timestamp"] = timestamp
                 requestParams["sign_type"] = "normal"
                 let signTypeState = ["normal", "md5", "sha1"]
-                if let sign = self.params["sign_type"] as String? {
+                if let sign = self.params["sign_type"] as? String {
                     for state in signTypeState {
                         if state == sign {
                             self.signType = sign
@@ -64,14 +64,14 @@ public class Message {
         if params != nil {
             requestParams = params!
         }
-        if let appid = self.params["appid"] as String? {
+        if let appid = self.params["appid"] as? String {
             requestParams["appid"] = appid
             getTimestamp {
                 timestamp in
                 requestParams["timestamp"] = timestamp
                 requestParams["sign_type"] = "normal"
                 let signTypeState = ["normal", "md5", "sha1"]
-                if let sign = self.params["sign_type"] as String? {
+                if let sign = self.params["sign_type"] as? String {
                     for state in signTypeState {
                         if state == sign {
                             self.signType = sign
@@ -96,14 +96,14 @@ public class Message {
         if params != nil {
             requestParams = params!
         }
-        if let appid = self.params["appid"] as String? {
+        if let appid = self.params["appid"] as? String {
             requestParams["appid"] = appid
             getTimestamp {
                 timestamp in
                 requestParams["timestamp"] = timestamp
                 requestParams["sign_type"] = "normal"
                 let signTypeState = ["normal", "md5", "sha1"]
-                if let sign = self.params["sign_type"] as String? {
+                if let sign = self.params["sign_type"] as? String {
                     for state in signTypeState {
                         if state == sign {
                             self.signType = sign
@@ -128,14 +128,14 @@ public class Message {
         if params != nil {
             requestParams = params!
         }
-        if let appid = self.params["appid"] as String? {
+        if let appid = self.params["appid"] as? String {
             requestParams["appid"] = appid
             getTimestamp {
                 timestamp in
                 requestParams["timestamp"] = timestamp
                 requestParams["sign_type"] = "normal"
                 let signTypeState = ["normal", "md5", "sha1"]
-                if let sign = self.params["sign_type"] as String? {
+                if let sign = self.params["sign_type"] as? String {
                     for state in signTypeState {
                         if state == sign {
                             self.signType = sign
@@ -179,8 +179,8 @@ public class Message {
         let api = "https://api.submail.cn/service/timestamp.json"
         get(api, params: nil) {
             JSON in
-            if let json = JSON as [String: AnyObject]? {
-                if let timestamp = json["timestamp"] as NSNumber? {
+            if let json = JSON as? [String: AnyObject] {
+                if let timestamp = json["timestamp"] as? NSNumber {
                     completion(timestamp.stringValue)
                 }
             }
@@ -189,7 +189,7 @@ public class Message {
     
     private func createSignature(params: [String: AnyObject]) -> String {
         if self.signType == "normal" {
-            if let signature = self.params["appkey"] as String? {
+            if let signature = self.params["appkey"] as? String {
                 return signature
             } else {
                 return ""
@@ -200,7 +200,7 @@ public class Message {
     }
     
     private func buildSignature(params: [String: AnyObject]) -> String {
-        let sortedArray = sorted(params.keys.array)
+        let sortedArray = params.keys.sort()
         var signStr = ""
         for key in sortedArray {
             if key != "attachments" {
@@ -209,7 +209,7 @@ public class Message {
                 }
             }
         }
-        signStr = signStr.substringToIndex(advance(signStr.startIndex, signStr.utf16Count-1))
+        signStr = signStr.substringToIndex(signStr.startIndex.advancedBy(signStr.characters.count-1))
         
         signStr = self.appId + self.appKey + signStr + self.appId + self.appKey
         
